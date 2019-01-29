@@ -140,13 +140,14 @@ function click(event) {
         document.getElementById('title').innerHTML = "GAME OVER";
     } else {
         showTile(id);
+         
+        // if all tiles are revealed, the user has won
+        if (checkWin() == true){
+            document.getElementById('title').innerHTML = "YOU WIN";
+        }
+        
     }
 
-    // if all tiles are revealed, the user has won
-    if (checkWin() == true){
-        document.getElementById('title').innerHTML = "YOU WIN";
-    }
-    
 }
 
 // check to see if the user has won the game -- if only mines are left uncovered
