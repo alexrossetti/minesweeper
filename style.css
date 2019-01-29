@@ -1,0 +1,82 @@
+* {
+    padding: 0px;
+    margin: 0px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.container {
+    width: 80%;
+    margin: 0px auto;
+    margin-top: 50px;
+    text-align: center;
+}
+
+#info {
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+
+#board {
+    border: 1px solid black;
+    display: inline-block;
+}
+
+
+.tile {
+    width: 25px;
+    height: 25px;
+    background-color: #ccc;
+    border: 1px solid black;
+    display: block;
+    float: left;
+}
+
+.revealed {
+    width: 25px;
+    height: 25px;
+    background-color: #f4f4f4;
+    border: 1px solid black;
+    display: block;
+    float: left;
+    line-height: 25px;
+    color: #000;
+    text-align: center;
+    font-size: 20px;
+}
+
+.tile:hover {
+    background-color: #e6e6e6;
+}
+
+.clear {
+    clear: left;
+}
+
+.mine {
+    background-color: #ff0000;
+}
+
+.mine:hover {
+    background-color: #ff0000;
+}
+
+
+#title {
+    font-size: 24px;
+    margin-top: 20px;
+}
+
+#start-btn {
+    padding: 12px;
+    background-color: #feffdf;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+    border: 1px solid #ccc;
+}
+
+#start-btn:focus {
+    outline: none;
+}
