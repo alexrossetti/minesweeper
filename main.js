@@ -1,9 +1,12 @@
-
-let grid = [];
 const rows = 8;
 const columns = 8;
 let revealed = 0;
-let mines = 8;
+let mines = 10;
+let grid = new Array(rows);
+
+for (let i = 0; i < grid.length; i++){
+    grid[i] = new Array(columns);
+}
 
 function init() {
     reset();
@@ -12,131 +15,110 @@ function init() {
 }
 
 function reset(){
+    document.getElementById('info').innerHTML = "";
     document.getElementById('board').innerHTML = "";
     document.getElementById('title').innerHTML = "";
-    grid = [];
 }
 
 function createBoard(rows, columns) {
 
-    for (let i = 1; i <= rows; i++){
-        for (let j = 1; j <= columns; j++){
+    for (let i = 0; i < grid.length; i++){
+        grid[i] = new Array(columns);
+    }
+
+    for (let i = 0; i < rows; i++){
+        for (let j = 0; j < columns; j++){
             let tile = document.createElement('div');
             tile.className = 'tile';
             tile.addEventListener('mousedown', click);
-            tile.id = "tile"+(j + (rows * (i-1))-1);
+            tile.id = "tile"+(j + (rows * (i)));
             document.getElementById('board').appendChild(tile);
-            grid.push('tile');
+            grid[i][j] = 'tile';
         }
         const breaker = document.createElement('div');
         breaker.className = 'clear';
         document.getElementById('board').appendChild(breaker);
-        const info = document.createElement('div');
-        document.getElementById('info').appendChild(info);
     }
-
+    
+    const info = document.createElement('div');
+    document.getElementById('info').appendChild(info);
     info.innerHTML = 'Mines: '+mines;
 }
 
 
 function addMines(mines, tiles) {
 
-    // for each mine, choose a random tile for the mine
-    for (let i = 0; i < mines; i++){
-        const random = Math.floor((Math.random()*tiles));
+    let minesAdded = 0;
 
-        // don't assign the same tile as a mine more than once
-        if (check(random) != 'mine'){
-            grid[random] = 'mine';
-        } else {
-            i--;
+    while (minesAdded < mines){
+        let column = Math.floor(Math.random() * columns);
+        let row = Math.floor(Math.random() * rows);
+     
+        if (grid[row][column] != 'mine') {
+            grid[row][column] = 'mine';
+            minesAdded++;
         }
     }
 
     // get the number of adjacent mines for each tile
-    for (let x = 0; x < tiles; x++){
-        
-        if (check(x) != 'mine') {
-            // corner squares
-            if (x === 0) {
-                grid[x] = 
-                    ((check(x+1) == 'mine') | 0)
-                    +((check(x+columns) == 'mine') | 0)
-                    +((check(x+(columns+1)) == 'mine') | 0);
-            } else if (x === columns-1) {
-                grid[x] = 
-                    ((check(x-1) == 'mine') | 0)
-                    +((check(x+columns) == 'mine') | 0)
-                    +((check(x+(columns-1)) == 'mine') | 0);
-            } else if (x === (rows*columns)-columns){
-                grid[x] = 
-                    ((check(x+1) == 'mine') | 0)
-                    +((check(x-columns) == 'mine') | 0)
-                    +((check(x-(columns+1)) == 'mine') | 0);
-            } else if (x === (rows*columns)-1) {
-                grid[x] = 
-                    ((check(x-1) == 'mine') | 0)
-                    +((check(x-columns) == 'mine') | 0)
-                    +((check(x-(columns+1)) == 'mine') | 0);
-            } else if (x % columns === 0) {           // squares in the left-hand column
-                grid[x] = 
-                    ((check(x-columns) == 'mine') | 0)
-                    +((check(x-(columns+1)) == 'mine') | 0)
-                    +((check(x+1) == 'mine') | 0)
-                    +((check(x+columns) == 'mine') | 0)
-                    +((check(x+(columns+1)) == 'mine') | 0);
-            } else if (x % rows === columns-1) {       // squares in the right-hand column
-                grid[x] = 
-                    ((check(x-columns) == 'mine') | 0)
-                    +((check(x-(columns-1)) == 'mine') | 0)
-                    +((check(x-1) == 'mine') | 0)
-                    +((check(x+columns) == 'mine') | 0)
-                    +((check(x+(columns-1)) == 'mine') | 0);
-            } else if (x < columns) {                 // squares on top row
-                grid[x] = 
-                    ((check(x-1) == 'mine') | 0)
-                    +((check(x+1) == 'mine') | 0)
-                    +((check(x+(columns-1)) == 'mine') | 0)
-                    +((check(x+columns) == 'mine') | 0)
-                    +((check(x+(columns+1)) == 'mine') | 0);
-            } else if (x > (rows*columns)-(columns+1)){                 // squares on bottom row
-                grid[x] = 
-                    ((check(x-columns) == 'mine') | 0)
-                    +((check(x-(columns+1)) == 'mine') | 0)
-                    +((check(x-(columns-1)) == 'mine') | 0)
-                    +((check(x-1) == 'mine') | 0)
-                    +((check(x+1) == 'mine') | 0);
-            } else {                                        // all other squares
-                grid[x] = 
-                    ((check(x-(columns+1)) == 'mine') | 0)
-                    +((check(x-columns) == 'mine') | 0)
-                    +((check(x-(columns-1)) == 'mine') | 0)
-                    +((check(x-1) == 'mine') | 0)
-                    +((check(x+1) == 'mine') | 0)
-                    +((check(x+(columns-1)) == 'mine') | 0)
-                    +((check(x+columns) == 'mine') | 0)
-                    +((check(x+(columns+1)) == 'mine') | 0);
+    for (let i = 0; i < rows; i++){
+        for (let j = 0; j < columns; j++){
+            if (check(i, j) != 'mine'){
+                grid[i][j] = getNeighbours(i, j);
             }
         }
-        
     }
 
 }
 
+// for each tile, if it's not a mine, check its neighbours and return the number of mines adjacent to it
+function getNeighbours(row, column){
+
+    let total = 0;
+
+    // i offset in x direction, j offset in y direction
+    for (let i = -1; i <= 1; i++){
+        for (let j = -1; j <= 1; j++){
+
+            const xOffset = row + i;
+            const yOffset = column + j;
+
+            // if it's not on the grid, ignore it
+            if (xOffset > -1 && xOffset < columns && yOffset > -1 && yOffset < rows){
+                
+                if (check(xOffset, yOffset) == 'mine'){
+                    //console.log("mine at " + xOffset, yOffset);
+                    total++;
+                }   
+            }
+
+        }
+    }
+
+    return total;
+}
+
 
 function click(event) {
-    let id = event.target.id;
-    
+    let id = event.target.id.substr(4);
+   
+    // translate id into the index of the 2d grid array; 
+    row = Math.floor(id / columns);
+    column = id % rows;
+
     // if user clicks on a mine, display all the mines and game over. Otherwise show the tile
-    if (check(id.substr(4)) === 'mine') {
+    if (check(row, column) === 'mine') {
         
-        for (let x = 0; x < rows*columns; x++){
-            if (grid[x] == 'mine'){
-                document.getElementById('tile'+x).className += ' mine';
-            } else {
-                showTile('tile'+x);
+        for (let i = 0; i < rows; i++){
+            for (let j = 0; j < columns; j++){
+                if (check(i, j) == 'mine'){
+                    document.getElementById('tile'+((i*columns)+j)).className += ' mine';   
+                } else {
+                    showTile((i*columns)+j);
+                }
+                
             }
-        }
+        }       
         document.getElementById('title').innerHTML = "GAME OVER";
     } else {
         showTile(id);
@@ -150,12 +132,60 @@ function click(event) {
 
 }
 
+function showTile(id) {
+    let tile = document.getElementById('tile'+id);
+    let tileId = id;
+    const row = Math.floor(id / columns);
+    const column = id % rows;
+    
+    revealed++;
+    tile.className = 'revealed';
+
+    if (check(row, column) > 0){
+        tile.innerHTML = '<h4>'+check(row, column)+'</h4>';
+    }
+
+    if (check(row, column) == 0) {   
+    
+        for (let i = -1; i <= 1; i++){
+            for (let j = -1; j <= 1; j++){
+
+                if (!(i == 0 && j == 0)){
+
+                    const xOffset = row + i;
+                    const yOffset = column + j;
+
+                    //console.log(xOffset, yOffset);
+
+                    // if it's not on the grid, ignore it
+                    if (xOffset > -1 && xOffset < rows && yOffset > -1 && yOffset < columns){
+                        const newId = (xOffset * columns) + yOffset;
+                        
+                        if (!(document.getElementById('tile'+newId).classList.contains('revealed'))){ 
+                            showTile(newId);    
+                        }
+                        
+                    }
+
+                }
+
+            }
+        }
+
+       
+    }
+    
+}
+
+
 // check to see if the user has won the game -- if only mines are left uncovered
 function checkWin(){
 
-    for (let i = 0; i < rows*columns; i++){
-        if ((document.getElementById('tile'+i).className != 'revealed') && (check(i) != 'mine')){
-            return false;
+    for (let i = 0; i < rows; i++){
+        for (let j = 0; j < columns; j++){
+            if ((document.getElementById('tile'+((rows*i)+j)).className != 'revealed') && (check(i, j) != 'mine')){
+                return false;
+            }   
         }
     }
 
@@ -163,54 +193,9 @@ function checkWin(){
 }
 
 
-function showTile(id) {
-    let tile = document.getElementById(id);
-    let tileId = parseInt(id.substr(4));
-
-    if (check(tileId) != 'mine'){
-        revealed++;
-
-        tile.className = 'revealed';
-        if (check(tileId) > 0){
-            tile.innerHTML = '<h4>'+check(tileId)+'</h4>';
-        }
-        
-        // if tile has no mines around it, check and reveal neighbouring tiles
-        if (check(tileId) == 0) {   
-            
-            if (tileId === (columns-1) && document.getElementById('tile'+(tileId-1)).className != 'revealed') {
-                showTile('tile'+(tileId-1));
-            }
-            if (tileId % columns < (columns-1) && document.getElementById('tile'+(tileId+1)).className != 'revealed') {
-                    showTile('tile'+(tileId+1));
-            }  
-            if (tileId < (rows*columns)-columns && document.getElementById('tile'+(tileId+8)).className != 'revealed') {
-                    showTile('tile'+(tileId+columns));
-            } 
-            if (tileId > (columns-1) && document.getElementById('tile'+(tileId-8)).className != 'revealed'){
-                showTile('tile'+(tileId-columns));
-            }
-            if ((tileId % columns > 0) && (tileId > (columns-1)) && document.getElementById('tile'+(tileId-(columns+1))).className != 'revealed'){
-                showTile('tile'+(tileId-(columns+1)));
-            }
-            if ((tileId % columns != (columns-1)) && (tileId > (columns-1)) && document.getElementById('tile'+(tileId-(columns-1))).className != 'revealed'){
-                showTile('tile'+(tileId-(columns-1)));
-            }
-            if ((tileId % columns > 0) && (tileId < (rows*columns)-columns) && document.getElementById('tile'+(tileId+(columns-1))).className != 'revealed'){
-                showTile('tile'+(tileId+(columns-1)));
-            }
-            if ((tileId % columns > 0) && (tileId < (rows*columns)-(columns+1)) && document.getElementById('tile'+(tileId+(columns+1))).className != 'revealed'){
-                showTile('tile'+(tileId+(columns+1)));
-            }
-
-        }
-    }
-
-}
-
 // checks if a tile is a mine -- returns the value of a particular tile on the board
-function check(id) {
-    return (grid[id]);
+function check(row, column) {
+    return (grid[row][column]); 
 }
 
 window.onload = function(){
