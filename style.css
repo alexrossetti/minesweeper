@@ -7,9 +7,40 @@
 .container {
     width: 80%;
     margin: 0px auto;
-    margin-top: 50px;
+    margin-top: 30px;
     text-align: center;
 }
+
+.sizeButtons {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto 15px auto;
+    width: 60%;
+}
+
+.sizeButtons button {
+    flex: 1;
+    padding: 5px 10px;
+    border: 1px solid #666;
+    border-radius: 5px;
+    margin: 0px 5px;
+    font-size: 14px;
+}
+
+.sizeButtons button:hover {
+    cursor: pointer;
+}
+
+.sizeButtons button:focus {
+    outline: none;
+}
+
+.sizeButtons .active {
+    border: 2px solid #333;
+    color: #fff;
+    background-color: #cc0000;
+}
+
 
 #info {
     margin-bottom: 20px;

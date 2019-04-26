@@ -1,14 +1,18 @@
-const rows = 8;
-const columns = 8;
+let rows = 8;
+let columns = 8;
 let revealed = 0;
 let mines = 10;
 let grid = new Array(rows);
 
-for (let i = 0; i < grid.length; i++){
-    grid[i] = new Array(columns);
-}
 
 function init() {
+
+    grid = new Array(rows);
+
+    for (let i = 0; i < grid.length; i++){
+        grid[i] = new Array(columns);
+    }
+
     reset();
     createBoard(rows, columns);
     addMines(mines, (rows*columns));
@@ -175,6 +179,35 @@ function showTile(id) {
        
     }
     
+}
+
+function changeSize(size) {
+    rows = size;
+    columns = size;
+    mines = (size + Math.floor(size / 4));
+
+    // remove all active classes on buttons, add active on clicked button
+    switch (size){
+        case 18:
+            document.getElementById('large-btn').classList.add('active');
+            document.getElementById('medium-btn').classList.remove('active');
+            document.getElementById('small-btn').classList.remove('active');
+            break;
+        case 12:
+            document.getElementById('large-btn').classList.remove('active');
+            document.getElementById('medium-btn').classList.add('active');
+            document.getElementById('small-btn').classList.remove('active');
+            break;
+        case 8:
+            document.getElementById('large-btn').classList.remove('active');
+            document.getElementById('medium-btn').classList.remove('active');
+            document.getElementById('small-btn').classList.add('active');
+            break;
+        default:
+            break;
+    }
+
+    init();
 }
 
 
